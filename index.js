@@ -80,10 +80,10 @@ app.get("/petitions", async function(req, res) {
 });
 
 app.get("/donations", async function(req, res) {
-  console.log(req.body);
   try {
     const donations = await getLastDonations();
-    res.json({ data: donations });
+    const total = await getTotalDonated();
+    res.json({ data: { lastTen: donations, total } });
   } catch (ex) {
     console.trace(ex);
     res.json({ error: true });
@@ -174,5 +174,18 @@ const getLastDonations = async () => {
     []
   );
   return donations;
+};
+
+const getTotalDonated = async () => {
+  let total = await asDBPromise(
+    connection,
+    `SELECT SUM(amount) FROM donations;`,
+    []
+  );
+  if (total.length === 1) {
+    return total[0]["SUM(amount)"];
+  } else {
+    return 0;
+  }
 };
 app.listen(process.env.PORT);
