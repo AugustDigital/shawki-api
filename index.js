@@ -173,7 +173,14 @@ const getLastDonations = async () => {
     `SELECT * FROM donations ORDER BY timestamp DESC LIMIT 10;`,
     []
   );
-  return donations;
+  return donations.map(donation => {
+    console.log(donation);
+    if (donation.anonymous) {
+      donation.firstname = null;
+      donation.lastname = null;
+    }
+    return donation;
+  });
 };
 
 const getTotalDonated = async () => {
